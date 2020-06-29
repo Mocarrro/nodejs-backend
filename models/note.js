@@ -15,6 +15,10 @@ const noteSchema = new mongoose.Schema({
     handled: {
         type: Boolean,
         default: false
+    },
+    canceled: {
+        type: Boolean,
+        default: false
     }
 });
 

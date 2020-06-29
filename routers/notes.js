@@ -8,51 +8,69 @@ router.use(cors())
 
 router.get('/', async (req, res) => {
     try {
-        const notes = await Note.find()
-        res.json(notes)
+        const notes = await Note.find();
+        res.json(notes);
     } catch (error) {
         res.status(500).json({
             message: error.message
         })
     }
-})
+});
 
-router.post('/', async (req, res) => {
-    const delayValue = req.body.noteDelay;
-    const noteValue = transformText(req.body.noteText)
-    console.log(noteValue)
+router.post('/', async (request, response) => {
+    const delayValue = request.body.noteDelay;
+    const noteValue = transformText(request.body.noteText)
     const note = new Note({
         noteText: noteValue,
         noteDelay: delayValue,
-        timestamp: req.body.timestamp
-    })
+        timestamp: request.body.timestamp
+    });
+
     try {
         if (!delayValue) {
-            res.status(400).json({ message: 'Delay is required' });
-        }
-        else {
-            const newNote = await note.save();
-            setTimeout(() => {
-                sendResponse(res, newNote);
+            response.status(400).json({ message: 'Delay is required' });
+        } else {
+            await note.save();
+
+            setTimeout(async () => {
+                const givenNote = await Note.findOne({ _id: note.id });
+
+                if (!!givenNote && !givenNote.canceled) {
+                    note.handled = true;
+                    await note.save();
+
+                    const allValidNotes = await Note
+                        .find({ canceled: false, handled: true })
+                        .sort({ timestamp: 'asc' });
+
+                    response.status(201).json(allValidNotes);
+                } else {
+                    response.status(200).json(null);
+                }
             }, delayValue);
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        response.status(400).json({ message: error.message });
     }
 });
 
-module.exports = router
+router.post('/cancel', async (request, response) => {
+    const allCancelableNotes = await Note
+        .find({ canceled: false, handled: false });
 
-async function sendResponse(response, note) {
+    allCancelableNotes.forEach(async (note) => {
+        note.canceled = true;
+        await note.save();
+    });
 
-    const notes = await Note.find().sort({ timestamp: 'asc' });
-    response.status(201).json(notes);
-}
+    response.status(200).json(null);
+});
 
-function transformText(text){
-
+function transformText(text) {
     text = text.toUpperCase();
-    text = text.replace(/ /g,"_"); 
+    text = text.replace(/ /g, "_");
 
     return text;
 }
+
+module.exports = router;
