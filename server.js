@@ -16,10 +16,6 @@ app.use(express.json())
 const notesRouter = require('./routers/notes')
 app.use('/notes', notesRouter)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> c055755... first commit
 app.listen(3000, () => console.log('Server started'))
 
 

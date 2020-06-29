@@ -4,8 +4,7 @@ const noteSchema = new mongoose.Schema({
     noteText: {
         type: String,
         required: true
-    }
-    ,
+    },
     noteDelay: {
         type: Number
     }

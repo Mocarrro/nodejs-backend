@@ -1,10 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const Note = require('../models/note')
-<<<<<<< HEAD
-=======
-
->>>>>>> c055755... first commit
 const cors = require('cors')
 
 router.use(cors())
