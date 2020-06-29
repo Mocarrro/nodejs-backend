@@ -7,7 +7,15 @@ const noteSchema = new mongoose.Schema({
     },
     noteDelay: {
         type: Number
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now
+    },
+    handled: {
+        type: Boolean,
+        default: false
     }
-})
+});
 
 module.exports = mongoose.model('Note', noteSchema)

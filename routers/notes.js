@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Note = require('../models/note')
+
 const cors = require('cors')
 
 router.use(cors())
@@ -20,23 +21,28 @@ router.post('/', async (req, res) => {
     const delayValue = req.body.noteDelay
     const note = new Note({
         noteText: req.body.noteText,
-        noteDelay: delayValue
+        noteDelay: delayValue,
+        timestamp: req.body.timestamp
     })
     try {
-        if (delayValue == null) {
-            res.status(400).json({ message: 'Delay is required' })
+        if (!delayValue) {
+            res.status(400).json({ message: 'Delay is required' });
         }
         else {
-            const newNote = await note.save()
+            const newNote = await note.save();
             setTimeout(() => {
-                res.status(201).json(newNote)
-            },
-                delayValue);
+                sendResponse(res, newNote);
+            }, delayValue);
         }
-
     } catch (error) {
-        res.status(400).json({ message: error.message })
+        res.status(400).json({ message: error.message });
     }
-})
+});
 
 module.exports = router
+
+async function sendResponse(response, note) {
+
+    const notes = await Note.find().sort({ timestamp: 'asc' });
+    response.status(201).json(notes);
+}
