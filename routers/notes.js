@@ -18,9 +18,11 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const delayValue = req.body.noteDelay
+    const delayValue = req.body.noteDelay;
+    const noteValue = transformText(req.body.noteText)
+    console.log(noteValue)
     const note = new Note({
-        noteText: req.body.noteText,
+        noteText: noteValue,
         noteDelay: delayValue,
         timestamp: req.body.timestamp
     })
@@ -45,4 +47,12 @@ async function sendResponse(response, note) {
 
     const notes = await Note.find().sort({ timestamp: 'asc' });
     response.status(201).json(notes);
+}
+
+function transformText(text){
+
+    text = text.toUpperCase();
+    text = text.replace(/ /g,"_"); 
+
+    return text;
 }
