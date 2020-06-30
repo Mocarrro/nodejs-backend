@@ -5,6 +5,9 @@ GET http://localhost:3000/notes
 POST http://localhost:3000/notes/cancel
 ###
 
+POST http://localhost:3000/notes/delete
+###
+
 POST http://localhost:3000/notes
 Content-Type: application/json
 

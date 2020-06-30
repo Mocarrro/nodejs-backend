@@ -3,15 +3,28 @@ const router = express.Router()
 const Note = require('../models/note')
 
 const cors = require('cors')
+const note = require('../models/note')
 
 router.use(cors())
 
-router.get('/', async (req, res) => {
+router.get('/', async (request, response) => {
     try {
         const notes = await Note.find();
-        res.json(notes);
+        response.json(notes);
     } catch (error) {
-        res.status(500).json({
+        response.status(500).json({
+            message: error.message
+        })
+    }
+});
+
+router.delete('/delete', async (request, response) => {
+    try {
+        await Note.deleteMany({});
+        const notes = await Note.find({});
+        response.json(notes);
+    } catch (error) {
+        response.status(500).json({
             message: error.message
         })
     }
@@ -19,7 +32,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (request, response) => {
     const delayValue = request.body.noteDelay;
-    const noteValue = transformText(request.body.noteText)
+    const noteValue = transformText(request.body.noteText);
     const note = new Note({
         noteText: noteValue,
         noteDelay: delayValue,
